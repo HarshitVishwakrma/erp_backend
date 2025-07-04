@@ -12,6 +12,7 @@ from .views import editvehicaldetails
 from .views import purchaseview
 from .views import inwardchallanview
 from .views import outwardchallanview
+from .views import supplierview
 from .import views
 router = DefaultRouter()
 router.register(r'onwardchallan', OnwardChallanViewSet)
@@ -30,4 +31,5 @@ urlpatterns=router.urls+[
    path('inwardchallanview/',inwardchallanview.as_view(),name='inwardchallanview'),
 #    /sales/inwardchallanview/?supplier=SUPPLIER_NAME
 #    path('inward/', views.inward, name='inward'),
+    path('supplierview/',supplierview.as_view(),name='onwardchallandetails-by-supplier')
 ]
