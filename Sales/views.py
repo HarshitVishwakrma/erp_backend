@@ -14,8 +14,11 @@ from .serializers import vehicaldetailsSerializer
 from .serializers import outwardchallanSerializer
 from .utils import create_challanNumber
 from All_Masters.models import Item as Item2
-from All_Masters.serializers import ItemSerializer
-from Purchase.models import PurchasePO 
+from Purchase.serializers import ItemSerializer, ItemDetailSerializer
+from Purchase.models import PurchasePO
+from django.db.models import Q
+
+
 class OnwardChallanViewSet(viewsets.ModelViewSet):
     queryset = onwardchallan.objects.all()
     serializer_class = OnwardChallanSerializer
@@ -163,22 +166,41 @@ class inwardchallanview(APIView):
         if not supplier:
             return Response({"error": "supplier parameter is required."}, status=400)
 
-        #  Find all PurchasePOs for this supplier
-        purchase_orders = PurchasePO.objects.filter(Supplier__iexact=supplier)
+        supplier = supplier.strip()
+        purchase_orders = PurchasePO.objects.filter(
+            Q(Supplier__icontains=supplier) |
+            Q(Supplier__iexact=supplier)
+        )
         if not purchase_orders.exists():
-            return Response({"error": f"No PurchasePO found for supplier '{supplier}'"}, status=404)
+            return Response(
+                {"error": f"No PurchasePO found for supplier '{supplier}'"},
+                status=404
+            )
 
         results = []
-        for po in purchase_orders:
-            items = Item2.objects.filter(purchase_order=po)
-            items_data = ItemSerializer(items, many=True).data
+        all_details = []
 
+        for po in purchase_orders:
+            # 1) Items on this PO
+            items_qs = po.items.all()
+            items_data = ItemSerializer(items_qs, many=True).data
+
+            # 2) Details on this PO
+            detail_qs = po.Item_Detail_Enter.all()  # or use the related_name you set
+            details_data = ItemDetailSerializer(detail_qs, many=True).data
+
+            # collect into the per‑PO results
             results.append({
                 "purchase_order_no": po.PoNo,
-                "items": items_data
+                "items": items_data,
+                "item_details": details_data,      # <-- this is already an array
             })
+
+            # also flatten into a single array if you need that
+            all_details.extend(details_data)
 
         return Response({
             "supplier": supplier,
-            "results": results
+            "results": results,                  # list of per‑PO dicts
+            "all_item_details": all_details,     # flat list of every detail
         }, status=status.HTTP_200_OK)

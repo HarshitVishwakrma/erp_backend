@@ -620,6 +620,7 @@ class ItemSerializer(serializers.ModelSerializer):
 
         return instance
 
+
 #######################sup
 
 # This is for GET APIs that fetch limited fields for PDF/view
