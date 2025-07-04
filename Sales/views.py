@@ -204,3 +204,20 @@ class inwardchallanview(APIView):
             "results": results,                  # list of per‑PO dicts
             "all_item_details": all_details,     # flat list of every detail
         }, status=status.HTTP_200_OK)
+class supplierview(APIView):
+    def get(self, request):
+        supplier = request.query_params.get('supplier')
+        if not supplier:
+            return Response({"error": "supplier parameter is required."}, status=400)
+
+        # Filter onwardchallan by vendor name
+        challans = onwardchallan.objects.filter(vender__iexact=supplier)
+
+        if not challans.exists():
+            return Response({"error": f"No challans found for supplier '{supplier}'"}, status=404)
+
+        serializer = OnwardChallanSerializer(challans, many=True)
+        return Response({
+            "supplier": supplier,
+            "challans": serializer.data
+        }, status=status.HTTP_200_OK)
