@@ -431,3 +431,8 @@ class JobWorkItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = SupplierItem
         fields = ['id', 'Name', 'number']
+
+class QuotationComparisonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuotationComparison
+        fields = '__all__'
