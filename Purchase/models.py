@@ -611,3 +611,25 @@ class NewJobWorkPoInfo(models.Model):
      
     def __str__(self):
         return self.PoNo or "Unnamed PO"
+
+class QuotationComparison(models.Model):
+    select_RFQ = models.CharField(max_length=50, blank=True, null=True)
+    item = models.CharField(max_length=20, blank=True, null=True)
+    make = models.CharField(max_length=50, blank=True, null=True)
+    minimum_purchase_quantity = models.IntegerField(blank=True, null=True)
+    other_charges = models.IntegerField(blank=True, null=True)
+    payment_terms = models.CharField(max_length=20, blank=True, null=True)
+    date = models.DateField(blank=True, null=True)
+    supplier = models.CharField(max_length=50, blank=True, null=True)
+    uom = models.CharField(max_length=20, blank=True, null=True)
+    tax_applicable = models.CharField(max_length=50, blank=True, null=True)
+    remark_details = models.CharField(max_length=100, blank=True, null=True)
+    supplier_quote_no = models.CharField(max_length=20, blank=True, null=True)
+    basic_rate = models.IntegerField(blank=True, null=True)
+    delivery_mode = models.CharField(max_length=20, blank=True, null=True)
+    quote_date = models.DateField(blank=True, null=True)
+    discount = models.IntegerField(blank=True, null=True)
+    delivery_time = models.TimeField(blank=True, null=True)
+
+    def __str__(self):
+        return self.supplier 
