@@ -1,6 +1,8 @@
 from django.urls import path, include
 from .views import *
 from rest_framework.routers import DefaultRouter
+from .views import InwardSerializer
+
 
 
 router = DefaultRouter()
@@ -59,4 +61,5 @@ urlpatterns = [
     path('JobworkInwardChallan/', JobworkInwardChallanCreateView.as_view(), name="Jobwork-InwardChallan-CreateView"),
     path('JobworkInwardChallan/<int:pk>/', JobworkInwardChallanDetailView.as_view(), name="JobworkInward-ChallanDetail-View"),
     path('newjobworkpodetails/',newjobworkpodetails.as_view()),
+    path('InwardChallan/pdf/<int:pk>/', generate_inwardchallan_pdf, name='pdf'),
 ]
