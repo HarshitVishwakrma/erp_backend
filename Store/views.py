@@ -1055,3 +1055,70 @@ class newjobworkpodetails(APIView):
         pos = NewJobWorkPoInfo.objects.filter(Supplier__iexact=supplier)
         serializer = NewJobWorkPoInfoSerializer(pos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+from weasyprint import HTML
+from django.http import HttpResponse
+from django.template.loader import get_template
+
+def generate_inwardchallan_pdf(request, pk):
+    challan = get_object_or_404(InwardChallan2, pk=pk)
+
+    serializer = InwardChallanSerializer(challan)
+    challan_data = serializer.data
+    # context = {
+    #     'challan': challan_data 
+    # }
+    combined_items = zip(
+    challan_data.get("InwardChallanGSTDetails", []),
+    challan_data.get("InwardChallanTable", [])    
+)
+    gate_entry_no = challan.GateEntryNo
+    try:
+        grn_detail = GrnGenralDetail.objects.get(GateEntryNo=gate_entry_no)
+        heat_no = grn_detail.HeatNo
+    except GrnGenralDetail.DoesNotExist:
+        heat_no = None
+
+    # Sum all itemQty
+    # table_items = challan_data.get("InwardChallanTable", [])
+    # total_qty = 0
+    # for item in table_items:
+    #     qty = item.get('InQtyNOS')
+    #     try:
+    #         total_qty += float(qty) if qty else 0
+    #     except ValueError:
+    #         pass
+
+    table_items = challan_data.get("InwardChallanTable", [])
+    total_qty_no = 0
+    for item in table_items:
+        qty_str = item.get('InQtyNOS')
+        if qty_str:
+        # Remove "Nos", strip whitespace
+            qty_str = qty_str.replace("Nos", "").strip()
+        try:
+            total_qty_no += float(qty_str)
+        except (ValueError, TypeError):
+            pass
+
+    context = {
+    "challan": challan_data,
+    "items": combined_items,
+    "heat_no": heat_no,
+    "total_qty": total_qty_no
+
+}
+
+
+    # Render HTML
+    template = get_template('inwardchallan_detail.html')
+    html_content = template.render(context)
+
+    # Convert to PDF
+    pdf_file = HTML(string=html_content).write_pdf()
+
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="inwardchallan_{pk}.pdf"'
+    return response
+
