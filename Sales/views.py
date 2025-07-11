@@ -226,3 +226,24 @@ class supplierview(APIView):
             "supplier": supplier,
             "challans": serializer.data
         }, status=status.HTTP_200_OK)
+
+from django.template.loader import get_template
+from django.shortcuts import render,get_object_or_404,HttpResponse
+from weasyprint import HTML
+def generate_onwardchallan_pdf(request, pk):
+    challan = get_object_or_404(onwardchallan, pk=pk)
+    items = challan.items.all()
+
+    context = {
+        'challan': challan,
+        'items': items,
+    }
+
+    template = get_template('Sales/onwardchallan_details.html')
+    html_content = template.render(context)
+    pdf_file = HTML(string=html_content).write_pdf()
+
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="onwardchallan_{pk}.pdf"'
+    return response
+
