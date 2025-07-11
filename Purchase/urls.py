@@ -7,8 +7,9 @@ from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
 router.register(r'indents', IndentViewSet, basename='indent')
 router.register(r'NewJobWorkPO', NewJobWorkPoInfoViewSet)
+router.register(r'QuotationComparison',QuotationComparisonViewSet)
 
-urlpatterns = [
+urlpatterns =router.urls+ [
     path('api/', include(router.urls)),
     path('ItemDetail/', ItemDetailListCreate.as_view(), name='ItemDetail-retrieve-list-create'),
     path('ItemDetail/<int:pk>/', ItemDetailRetrieveUpdateDestroy.as_view(), name='ItemDetail-retrieve-update-destroy'),
@@ -58,4 +59,6 @@ urlpatterns = [
     path('purchase-order/pdf/<int:pk>/', generate_po_pdf, name='generate_po_pdf'),
     path('JobWorkPOList/', NewJobWorkPoInfoAPIView.as_view(), name='new_job_work_po_info_api'),
     path('SuppilerJobWorkPoFetch/', JobWorkItemSearchView.as_view(), name='job-work-items'),
+    path('QuotationComparison/delete/<int:pk>/', DeleteQuotationComparison.as_view(), name='quotationcomparison-delete'),
+    path('QuotationComparison/edit/<int:pk>/', EditQuotationComparison.as_view(), name='quotationcomparison-edit'),
 ]
