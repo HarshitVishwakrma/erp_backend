@@ -1567,3 +1567,44 @@ class JobWorkItemSearchView(generics.ListAPIView):
     queryset = SupplierItem.objects.filter(type='Job Work')
     filter_backends = [filters.SearchFilter]
     search_fields = ['Name', 'number']
+from rest_framework import viewsets
+from .models import QuotationComparison
+from .serializers import QuotationComparisonSerializer
+class QuotationComparisonViewSet(viewsets.ModelViewSet):
+    queryset = QuotationComparison.objects.all()
+    serializer_class = QuotationComparisonSerializer 
+
+class DeleteQuotationComparison(APIView):
+    def delete(self, request, pk):
+        try:
+            quotation = QuotationComparison.objects.get(pk=pk)
+            quotation.delete()
+            return Response(
+                {'message': f'QuotationComparison with id {pk} deleted successfully'},
+                status=status.HTTP_204_NO_CONTENT
+            )
+        except QuotationComparison.DoesNotExist:
+            return Response(
+                {'error': 'QuotationComparison not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
+
+class EditQuotationComparison(APIView):
+    def put(self, request, pk):
+        try:
+            quotation = QuotationComparison.objects.get(pk=pk)
+        except QuotationComparison.DoesNotExist:
+            return Response(
+                {'error': 'QuotationComparison not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = QuotationComparisonSerializer(quotation, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
