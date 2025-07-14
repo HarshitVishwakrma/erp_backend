@@ -1,8 +1,12 @@
 from django.urls import path, include
 from .views import *
 from rest_framework.routers import DefaultRouter
+<<<<<<< Updated upstream
 from .views import InwardSerializer
 
+=======
+from . import views
+>>>>>>> Stashed changes
 
 
 router = DefaultRouter()
@@ -62,4 +66,7 @@ urlpatterns = [
     path('JobworkInwardChallan/<int:pk>/', JobworkInwardChallanDetailView.as_view(), name="JobworkInward-ChallanDetail-View"),
     path('newjobworkpodetails/',newjobworkpodetails.as_view()),
     path('InwardChallan/pdf/<int:pk>/', generate_inwardchallan_pdf, name='pdf'),
+    path('newjobworkpodetails/',get_purchase_orders_by_supplier, name='purchase-orders-by-supplier'),
+    path('mrns/pending/', views.PendingMrnListView.as_view(), name='pending-mrns'),
+    path('mrns/pending_mrn', views.get_pending_mrns, name='get_pending_mrn')
 ]

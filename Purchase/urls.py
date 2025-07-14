@@ -63,4 +63,13 @@ urlpatterns =router.urls+ [
     path('QuotationComparison/delete/<int:pk>/', DeleteQuotationComparison.as_view(), name='quotationcomparison-delete'),
     path('QuotationComparison/edit/<int:pk>/', EditQuotationComparison.as_view(), name='quotationcomparison-edit'),
     path('GenrateRFQ/',generate_unique_rfq_no.as_view(),name='gererate_unique_rfq_no'),
+     path('purchase-orders/unverified/', views.get_unverified_purchase_orders, name='unverified_purchase_orders'),
+    path('purchase-orders/all/', views.get_purchase_orders, name='purchase_orders_all'),
+    path('purchase-orders/unverified/simple/', views.get_unverified_purchase_orders_simple, name='unverified_purchase_orders_simple'),
+    path('purchase-po/<int:po_id>/update-status-fbv/', views.update_approved_status, name='update_approved_status_fbv'),
+    path('indents/all', views.get_indents, name='indents_all'),
+    path('indents/pending-auth-fbv/', views.get_pending_indents, name='pending_auth_indents_fbv'),
+    path('indents/update-auth/', views.update_indent_auth_status, name='update_indent_auth'),
 ]
+   
+

@@ -117,12 +117,41 @@ class NewMRNItemSearchListView(generics.ListAPIView):
 
 from All_Masters.models import Add_New_Operator_Model
 from .serializers import NewMRNEmployeeDeptSerializer
+from rest_framework import generics, status
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from django.http import JsonResponse
+from .models import NewMrn
+from .serializers import NewMrnSerializer
 
 class NewMRNEmployeeDeptListView(generics.ListAPIView):
     queryset = Add_New_Operator_Model.objects.all()
     serializer_class = NewMRNEmployeeDeptSerializer
     filter_backends = [SearchFilter]
     search_fields = ['Code', 'Name', 'Type', 'Department']
+
+class PendingMrnListView(generics.ListAPIView):
+    serializer_class = NewMrnSerializer
+    
+    def get_queryset(self):
+        return NewMrn.objects.filter(Approve_status=['Pending', 'pending'])
+
+
+@api_view(['GET'])
+def get_pending_mrns(request):
+    try:
+        pending_mrns = NewMrn.objects.filter(Approve_status__in=['Pending', 'pending'])
+        serializer = NewMrnSerializer(pending_mrns, many=True)
+        return Response({
+            'success': True,
+            'count': pending_mrns.count(),
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
@@ -1043,18 +1072,54 @@ class JobworkInwardChallanDetailView(APIView):
 
 
 # Purchase se po details get api
-from Purchase.models import NewJobWorkPoInfo
-from Purchase.serializers import NewJobWorkPoInfoSerializer
-
-class newjobworkpodetails(APIView):
-    def get(self, request):
-        supplier = request.query_params.get('supplier')
-        if not supplier:
-            return Response({"error": "supplier parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
+@api_view(['GET'])
+def get_purchase_orders_by_supplier(request):
+    """
+    Get Purchase Orders by supplier name
+    URL: /api/purchase-orders/?supplier=<supplier_name>
+    """
+    supplier_name = request.query_params.get('supplier')
+    
+    if not supplier_name:
+        return Response(
+            {'error': 'Supplier parameter is required'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        # Filter purchase orders by supplier (case-insensitive search)
+        purchase_orders = PurchasePO.objects.filter(
+            Supplier__icontains=supplier_name
+        ).prefetch_related(
+            'Item_Detail_Enter',
+            'Gst_Details',
+            'Item_Details_Other',
+            'Schedule_Line',
+            'Ship_To_Add'
+        )
+        if not purchase_orders.exists():
+            return Response(
+                {'message': f'No purchase orders found for supplier: {supplier_name}'},
+                status=status.HTTP_404_NOT_FOUND
+            )
         
-        pos = NewJobWorkPoInfo.objects.filter(Supplier__iexact=supplier)
-        serializer = NewJobWorkPoInfoSerializer(pos, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = PurchasePOSerializer(purchase_orders, many=True)
+        
+        return Response({
+            'count': purchase_orders.count(),
+            'supplier': supplier_name,
+            'purchase_orders': serializer.data
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response(
+            {'error': f'An error occurred: {str(e)}'}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+        
+       
 
 
 from weasyprint import HTML
@@ -1121,4 +1186,4 @@ def generate_inwardchallan_pdf(request, pk):
     response = HttpResponse(pdf_file, content_type='application/pdf')
     response['Content-Disposition'] = f'inline; filename="inwardchallan_{pk}.pdf"'
     return response
-
+       

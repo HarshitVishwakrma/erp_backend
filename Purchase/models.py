@@ -436,8 +436,14 @@ class PurchasePO(models.Model):
     TOC_TDS = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     GR_Total = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
+    AprrovedStatusChoices = [
+        ('Approved', 'approved'),
+        ('Pending', 'pending'),
+        ('Rejected', 'reject')
+    ]
+    Approved_Status = models.CharField(choices=AprrovedStatusChoices, max_length=10, default='pending')
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    is_verified = models.BooleanField(default=True)
+    is_verified = models.BooleanField(default=False)
 
     
 

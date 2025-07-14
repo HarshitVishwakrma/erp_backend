@@ -61,6 +61,12 @@ class NewMrn(models.Model):
     MRN_date = models.CharField(max_length=255, blank=True, null=True)
     MRN_time = models.CharField(max_length=255, blank=True, null=True)
     Remark_2 = models.CharField(max_length=255, blank=True, null=True)
+    Approve_choices =[
+        ('Approved', 'approved'),
+        ('Pending', 'pending'),
+        ('Rejected', 'rejected')
+    ]
+    Approve_status = models.CharField(choices=Approve_choices, default='pending')
 
     def __str__(self):
         return f"{self.ItemCode} - {self.ItemCode}"
