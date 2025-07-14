@@ -633,3 +633,53 @@ class QuotationComparison(models.Model):
 
     def __str__(self):
         return self.supplier 
+
+class RFQ(models.Model):
+    RFQ_TYPE_CHOICES = [
+        ('single', 'For Single'),
+        ('enquiry', 'Against Enquiry'),
+    ]
+    UNIT_CHOICES = [
+    ('PCS', 'PCS'),
+    ('KGS', 'KGS'),
+    ('Box', 'Box'),
+    ('LTR', 'LTR'),
+    ('NOS', 'NOS'),
+    ('SQFT', 'SQFT'),
+    ('MTR', 'MTR'),
+    ('FOOT', 'FOOT'),
+    ('SQMTR', 'SQMTR'),
+    ('PAIR', 'PAIR'),
+    ('BAG', 'BAG'),
+    ('PACKET', 'PACKET'),
+    ('RIM', 'RIM'),
+    ('SET', 'SET'),
+    ('MT', 'MT'),
+    ('PER DAY', 'PER DAY'),
+    ('DOZEN', 'DOZEN'),
+    ('JOB', 'JOB'),
+    ('SQUINCH', 'SQUINCH'),]
+
+    rfq_type = models.CharField(max_length=10,choices=RFQ_TYPE_CHOICES )
+    rfq_no = models.CharField(max_length=50, unique=True,blank=True,null=True)
+    ITEM_TYPE_CHOICES = [
+        ('new', 'New'),
+        ('existing', 'Existing'),
+    ]
+    item = models.CharField(max_length=10,choices=ITEM_TYPE_CHOICES)
+    item_no = models.CharField(max_length=50)
+    quantity = models.DecimalField(max_digits=10, decimal_places=2)
+    delivery_location = models.TextField()
+    payment_term = models.TextField()
+    delivery_schedule = models.TextField()
+    to_date = models.DateField()
+    indent_no = models.CharField(max_length=50, blank=True, null=True)
+    unit = models.CharField(max_length=50,choices=UNIT_CHOICES)
+    quality_terms = models.TextField()
+    remark_details = models.TextField(blank=True, null=True)
+    expected_date = models.DateField(blank=True, null=True)
+    project_name=models.CharField(max_length=50,blank=True) 
+
+    def __str__(self):
+        return f"RFQ {self.rfq_no}"
+
