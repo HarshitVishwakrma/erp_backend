@@ -39,7 +39,7 @@ class ItemDetails(models.Model):
 
 
     def __str__(self):
-        return f"{self.SelectItem} - {self.SelectItem}"
+        return f"{self.ItemNo} - {self.Description}"
 
 # Store Module:- NEW MRN
 class NewMrn(models.Model):
