@@ -436,3 +436,11 @@ class QuotationComparisonSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuotationComparison
         fields = '__all__'
+
+class RFQSerializer(serializers.ModelSerializer):
+    rfq_type = serializers.ChoiceField(choices=RFQ.RFQ_TYPE_CHOICES)
+    item = serializers.ChoiceField(choices=RFQ.ITEM_TYPE_CHOICES)
+    unit = serializers.ChoiceField(choices=RFQ.UNIT_CHOICES)
+    class Meta:
+        model = RFQ
+        fields = '__all__' 
