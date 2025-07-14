@@ -1569,10 +1569,16 @@ class JobWorkItemSearchView(generics.ListAPIView):
     search_fields = ['Name', 'number']
 from rest_framework import viewsets
 from .models import QuotationComparison
+from .models import RFQ
 from .serializers import QuotationComparisonSerializer
+from .serializers import RFQSerializer
 class QuotationComparisonViewSet(viewsets.ModelViewSet):
     queryset = QuotationComparison.objects.all()
     serializer_class = QuotationComparisonSerializer 
+class RFQViewSet(viewsets.ModelViewSet):
+    queryset=RFQ.objects.all()
+    serializer_class=RFQSerializer
+
 
 class DeleteQuotationComparison(APIView):
     def delete(self, request, pk):
@@ -1607,4 +1613,14 @@ class EditQuotationComparison(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+from .utils import Create_RFQ_No
+
+class generate_unique_rfq_no(APIView):
+    def get(self, request):
+        try:
+            rfq_no = Create_RFQ_No()  
+            return Response({"rfq_no" : rfq_no}, status=status.HTTP_200_OK)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
