@@ -8,6 +8,7 @@ router = DefaultRouter()
 router.register(r'indents', IndentViewSet, basename='indent')
 router.register(r'NewJobWorkPO', NewJobWorkPoInfoViewSet)
 router.register(r'QuotationComparison',QuotationComparisonViewSet)
+router.register(r'RFQ',RFQViewSet)
 
 urlpatterns =router.urls+ [
     path('api/', include(router.urls)),
@@ -61,4 +62,5 @@ urlpatterns =router.urls+ [
     path('SuppilerJobWorkPoFetch/', JobWorkItemSearchView.as_view(), name='job-work-items'),
     path('QuotationComparison/delete/<int:pk>/', DeleteQuotationComparison.as_view(), name='quotationcomparison-delete'),
     path('QuotationComparison/edit/<int:pk>/', EditQuotationComparison.as_view(), name='quotationcomparison-edit'),
+    path('GenrateRFQ/',generate_unique_rfq_no.as_view(),name='gererate_unique_rfq_no'),
 ]
